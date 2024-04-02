@@ -1,0 +1,5 @@
+---
+
+- import_tasks: install_minio.yaml
+- import_tasks: configure_minio.yaml
+- import_tasks: start_minio.yaml

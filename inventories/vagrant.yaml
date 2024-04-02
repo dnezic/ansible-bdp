@@ -1,0 +1,9 @@
+minio:
+  hosts:
+    bigd-01.trialogic.hr:
+      ip_address: 10.0.0.100
+    bigd-02.trialogic.hr:
+      ip_address: 10.0.0.101
+    bigd-03.trialogic.hr:
+      ip_address: 10.0.0.102
+

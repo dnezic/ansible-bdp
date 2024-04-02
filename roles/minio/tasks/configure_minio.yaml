@@ -1,0 +1,27 @@
+---
+- name: "Minio::group"
+  group: name=minio-user state=present system=yes gid={{minio_gid}}
+
+- name: "Minio::user"
+  user: name=minio-user group=minio-user uid={{minio_uid}} state=present system=yes
+
+- name: "Minio::configure"
+  template:
+    src: minio.j2
+    dest: /etc/default/minio
+  notify:
+    - 'Minio::restart'
+
+- name: "Minio::permissions"
+  file:
+    path: "/mnt/drive-{{partition_idx + 1}}"
+    owner: minio-user
+    group: minio-user
+    mode: '0755'
+  loop:
+    - 'sdb'
+    - 'sdc'
+    - 'sdd'
+    - 'sde'
+  loop_control:
+    index_var: partition_idx

@@ -1,0 +1,63 @@
+---
+
+- name: "Vagrant::etc/hosts"
+  lineinfile:
+    dest:     /etc/hosts
+    regexp:   '.*{{ item }}$'
+    line:     '{{ hostvars[item].ip_address }} {{item}}'
+    state:    present
+  with_items: '{{ groups["all"] }}'
+
+- name: "Vagrant::create partition"
+  community.general.parted:
+    device: "/dev/{{item}}"
+    number: 1
+    state: present
+    fs_type: xfs
+  loop:
+    - 'sdb'
+    - 'sdc'
+    - 'sdd'
+    - 'sde'
+  loop_control:
+    index_var: partition_idx
+
+- name: "Vagrant::fstab"
+  ansible.posix.mount:
+    path: "/mnt/drive-{{partition_idx + 1}}"
+    src: "/dev/{{item}}"
+    fstype: xfs
+    state: present
+  loop:
+    - 'sdb'
+    - 'sdc'
+    - 'sdd'
+    - 'sde'
+  loop_control:
+    index_var: partition_idx
+
+
+- name: "Vagrant::create FS"
+  community.general.filesystem:
+    fstype: xfs
+    dev: "/dev/{{item}}"
+  loop:
+    - 'sdb'
+    - 'sdc'
+    - 'sdd'
+    - 'sde'
+
+
+- name: "Vagrant::mount"
+  ansible.posix.mount:
+    path: "/mnt/drive-{{partition_idx + 1}}"
+    src: "/dev/{{item}}"
+    fstype: xfs
+    state: mounted
+  loop:
+    - 'sdb'
+    - 'sdc'
+    - 'sdd'
+    - 'sde'
+  loop_control:
+    index_var: partition_idx

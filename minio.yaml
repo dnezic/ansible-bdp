@@ -1,0 +1,7 @@
+---
+
+- hosts: minio
+
+  roles:
+    - role: common
+    - role: minio

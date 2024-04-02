@@ -1,0 +1,5 @@
+- name: "Minio::restart"
+  service:
+    name: minio
+    state: restarted
+

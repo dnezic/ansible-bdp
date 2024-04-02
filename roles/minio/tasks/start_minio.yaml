@@ -1,0 +1,15 @@
+
+- name: "Minio::start"
+  service:
+    name: minio
+    state: started
+    enabled: yes
+
+
+- name: "Minio::restart"
+  service:
+    name: minio
+    state: restarted
+  tags:
+    - never
+    - 'Minio::restart'

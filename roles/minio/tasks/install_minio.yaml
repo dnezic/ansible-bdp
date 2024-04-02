@@ -1,0 +1,14 @@
+---
+
+
+- name: Gather the package facts
+  ansible.builtin.package_facts:
+    manager: auto
+
+- name: "Minio::install"
+  ansible.builtin.dnf:
+    name: "{{minio_rpm_url}}"
+    state: present
+  when: "'minio' not in ansible_facts.packages"
+
+
