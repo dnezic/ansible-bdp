@@ -1,0 +1,19 @@
+
+
+spark_version: 3.5.1
+spark_download_url: https://downloads.apache.org/spark/spark-{{ spark_version }}/spark-{{ spark_version }}-bin-hadoop3.tgz
+spark_package: spark-{{ spark_version }}-bin-hadoop3.tgz
+spark_group: spark
+spark_user: spark
+spark_root_dir: /opt
+spark_install_dir: '{{ spark_root_dir }}/spark-{{ spark_version }}-bin-hadoop3.tgz'
+spark_dir: '{{ spark_root_dir }}/spark'
+spark_user_home: '/var/lib/spark'
+spark_ssh_known_hosts_file: "{{ spark_user_home }}/.ssh/known_hosts"
+spark_master_ui_port: 9090
+spark_worker_ui_port: 9091
+spark_zookeeper_port: 2181 # zookeeper_nodes group is used
+spark_worker_cores: 2
+spark_worker_memory: 2g
+spark_daemon_memory: 512m
+spark_redistribute_keys: false

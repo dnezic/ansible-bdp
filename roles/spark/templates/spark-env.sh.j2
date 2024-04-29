@@ -1,0 +1,6 @@
+
+SPARK_WORKER_CORES={{ spark_worker_cores }}
+SPARK_WORKER_MEMORY={{ spark_worker_memory }}
+SPARK_DAEMON_MEMORY={{ spark_daemon_memory }}
+SPARK_DAEMON_JAVA_OPTS="-Dspark.deploy.recoveryMode=ZOOKEEPER -Dspark.deploy.zookeeper.url={% for host in groups['zookeeper_nodes'] %}{{hostvars[host].inventory_hostname}}:{{ spark_zookeeper_port }}{% if not loop.index == loop.length %},{% endif %}{% endfor %} -Dspark.deploy.zookeeper.dir=/spark"
+SPARK_WORKER_OPTS="-Dspark.worker.cleanup.enabled=true -Dspark.worker.cleanup.appDataTtl=259200"

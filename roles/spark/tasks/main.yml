@@ -1,0 +1,7 @@
+
+- import_tasks: aux-packages.yml
+- import_tasks: install-spark.yml
+- import_tasks: ssh-key.yml
+- import_tasks: configure-spark.yml
+- import_tasks: manage-spark.yml
+

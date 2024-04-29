@@ -1,0 +1,7 @@
+
+- hosts: spark_nodes
+  gather_facts: True
+  environment: "{{proxy_env}}"
+  roles:
+    - java
+    - spark

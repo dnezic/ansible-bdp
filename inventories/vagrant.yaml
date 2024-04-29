@@ -6,4 +6,30 @@ minio:
       ip_address: 10.0.0.101
     bigd-03.trialogic.hr:
       ip_address: 10.0.0.102
+  vars:
+    proxy_env: null
 
+zookeeper_nodes:
+  hosts:
+    bigd-01.trialogic.hr:
+      zookeeper_id: 1
+    bigd-02.trialogic.hr:
+      zookeeper_id: 2
+    bigd-03.trialogic.hr:
+      zookeeper_id: 3
+
+spark_nodes:
+  children:
+    spark_masters:
+      hosts:
+        bigd-01.trialogic.hr:
+        bigd-02.trialogic.hr:
+    spark_workers:
+      hosts:
+        bigd-01.trialogic.hr:
+        bigd-02.trialogic.hr:
+        bigd-03.trialogic.hr:
+  vars:
+    spark_worker_cores: 2
+    spark_worker_memory: 2g
+    spark_daemon_memory: 1g

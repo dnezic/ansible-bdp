@@ -1,0 +1,81 @@
+---
+
+
+- name: Create Spark group
+  group:
+    name: "{{ spark_group }}"
+    state: present
+  tags:
+    - install
+
+- name: Create Spark user on master
+  user:
+    name: "{{ spark_user }}"
+    group: "{{ spark_group }}"
+    state: present
+    createhome: yes
+    generate_ssh_key: yes
+    home: "{{ spark_user_home }}"
+  when: inventory_hostname == groups['spark_masters'][0]
+  tags:
+    - install
+
+- name: Create Spark user on all nodes
+  user:
+    name: "{{ spark_user }}"
+    group: "{{ spark_group }}"
+    state: present
+    createhome: yes
+    generate_ssh_key: yes
+    home: "{{ spark_user_home }}"
+  register: created_user
+  tags:
+    - install
+
+- name: Check if Spark has already been downloaded and unpacked
+  stat:
+    path: "{{ spark_install_dir }}"
+  register: dir
+  tags:
+    - install
+
+- name: Download Apache Spark
+  get_url:
+    url: "{{ spark_download_url }}"
+    dest: /tmp
+  when: not dir.stat.exists
+  tags:
+    - install
+
+- name: Create Spark installation dir {{ spark_install_dir }}
+  file:
+    path: "{{ spark_install_dir }}"
+    state: directory
+    group: "{{ spark_group }}"
+    owner: "{{ spark_user }}"
+    mode: 0755
+  when: not dir.stat.exists
+  tags:
+    - install
+
+- name: Unpack Spark
+  unarchive:
+    src: /tmp/{{ spark_package }}
+    dest: "{{ spark_install_dir }}"
+    copy: no
+    extra_opts: [--strip-components=1]
+    group: "{{ spark_group }}"
+    owner: "{{ spark_user }}"
+  when: not dir.stat.exists
+  tags:
+    - install
+
+- name: Create symlink to Spark installation
+  file:
+    src: "{{ spark_install_dir }}"
+    dest: "{{ spark_dir }}"
+    state: link
+    group: "{{ spark_group }}"
+    owner: "{{ spark_user }}"
+  tags:
+    - install

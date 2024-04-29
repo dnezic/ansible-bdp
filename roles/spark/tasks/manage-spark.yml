@@ -1,0 +1,48 @@
+
+- name: Spark | start masters
+  command:
+    cmd: './start-master.sh'
+  args:
+    chdir: "{{ spark_dir }}/sbin/"
+  when: "inventory_hostname in groups['spark_masters']"
+  become: true
+  become_user: "{{ spark_user }}"
+  tags:
+    - 'spark::masters-start'
+    - 'never'
+
+- name: Spark | stop masters
+  command:
+    cmd: './stop-master.sh'
+  args:
+    chdir: "{{ spark_dir }}/sbin/"
+  when: "inventory_hostname in groups['spark_masters']"
+  become: true
+  become_user: "{{ spark_user }}"
+  tags:
+    - 'spark::masters-stop'
+    - 'never'
+
+- name: Spark | start workers
+  command:
+    cmd: "./start-worker.sh spark://{% for host in groups['spark_masters'] %}{{ hostvars[host].inventory_hostname }}:7077{% if not loop.index == loop.length %},{% endif %}{% endfor %}"
+  args:
+    chdir: "{{ spark_dir }}/sbin"
+  when: "inventory_hostname in groups['spark_workers']"
+  become: true
+  become_user: "{{ spark_user }}"
+  tags:
+    - 'spark::workers-start'
+    - 'never'
+
+- name: Spark | stop workers
+  command:
+    cmd: "./stop-worker.sh spark://{% for host in groups['spark_masters'] %}{{ hostvars[host].inventory_hostname }}:7077{% if not loop.index == loop.length %},{% endif %}{% endfor %}"
+  args:
+    chdir: "{{ spark_dir }}/sbin"
+  when: "inventory_hostname in groups['spark_workers']"
+  become: true
+  become_user: "{{ spark_user }}"
+  tags:
+    - 'spark::workers-stop'
+    - 'never'

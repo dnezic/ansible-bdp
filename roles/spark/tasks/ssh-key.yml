@@ -1,0 +1,56 @@
+---
+- name: Check if ssh keys should be distributed
+  stat: path={{ spark_ssh_known_hosts_file }}
+  register: host_file_status
+
+- name: Set distribute keys variable
+  set_fact: distribute_keys={{not host_file_status.stat.exists or spark_redistribute_keys}}
+
+- name: Fetch private key
+  fetch: src={{ spark_user_home }}/.ssh/id_rsa dest=rsa_key
+  when: inventory_hostname == groups['spark_masters'][0]
+  check_mode: no
+
+- name: Fetch public key
+  fetch: src={{ spark_user_home }}/.ssh/id_rsa.pub dest=rsa_key
+  when: inventory_hostname == groups['spark_masters'][0]
+  check_mode: no
+
+- name: Create .ssh directory for {{spark_user}}
+  file: path={{ spark_user_home }}/.ssh state=directory owner={{spark_user}} group={{spark_group}} mode=0700
+
+- name: Copy private key to all machines
+  copy: src=rsa_key/{{ groups['spark_masters'][0] }}{{ spark_user_home }}/.ssh/id_rsa dest={{ spark_user_home }}/.ssh/id_rsa owner={{spark_user}} group={{spark_group}} mode=0600
+
+- set_fact: spark_master={{ groups["spark_masters"][0] }}
+
+- name: Add pubkeys to master server
+  authorized_key: user={{spark_user}} key="{{ lookup('file', 'rsa_key/{{spark_master}}{{ spark_user_home }}/.ssh/id_rsa.pub') }}"
+
+- name: Make sure the known hosts file exists
+  file: path={{ spark_ssh_known_hosts_file }} state=touch owner={{spark_user}} group={{spark_group}} mode=0644
+  when: (not host_file_status.stat.exists) or (distribute_keys and host_file_status.stat.mode == "0644")
+  changed_when: (not host_file_status.stat.exists) or host_file_status.stat.mode != "0644"
+
+- set_fact: spark_hosts_long={{ groups['spark_nodes'] }}
+
+- name: Check host name availability
+  shell: "ssh-keygen -f {{ spark_ssh_known_hosts_file }} -F {{ item }}"
+  with_items: "{{ spark_hosts_long }}"
+  when: distribute_keys
+  register: ssh_known_host_results
+  ignore_errors: yes
+  changed_when: False
+  tags:
+    - skip_ansible_lint
+
+- name: Scan the public key
+  shell: "ssh-keyscan -H -T 10 {{ item.item }} >> {{ spark_ssh_known_hosts_file }}"
+  with_items: "{{ ssh_known_host_results.results }}"
+  when: item.stdout is defined and item.stdout == ""
+  no_log: True
+
+- name: Delete key locally
+  local_action: file path=rsa_key state=absent
+  when: inventory_hostname == groups['spark_masters'][0] and distribute_keys
+  become: no

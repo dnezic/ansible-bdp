@@ -27,7 +27,7 @@ Vagrant.configure(2) do |config|
     # node1.vm.network :forwarded_port, guest: 22, host: 3220
 
     node1.vm.provider :virtualbox do |v|
-      v.customize ["modifyvm", :id, "--memory", 4000]
+      v.customize ["modifyvm", :id, "--memory", 6000]
       v.customize ["modifyvm", :id, "--name", "bigd-01.trialogic.hr"]
       v.customize ["modifyvm", :id, "--cpus", 2]
     end
@@ -46,7 +46,7 @@ Vagrant.configure(2) do |config|
     # node1.vm.network :forwarded_port, guest: 22, host: 3220
 
     node1.vm.provider :virtualbox do |v|
-      v.customize ["modifyvm", :id, "--memory", 4000]
+      v.customize ["modifyvm", :id, "--memory", 6000]
       v.customize ["modifyvm", :id, "--name", "bigd-02.trialogic.hr"]
       v.customize ["modifyvm", :id, "--cpus", 2]
     end
@@ -65,7 +65,7 @@ Vagrant.configure(2) do |config|
     # node1.vm.network :forwarded_port, guest: 22, host: 3220
 
     node1.vm.provider :virtualbox do |v|
-      v.customize ["modifyvm", :id, "--memory", 4000]
+      v.customize ["modifyvm", :id, "--memory", 6000]
       v.customize ["modifyvm", :id, "--name", "bigd-03.trialogic.hr"]
       v.customize ["modifyvm", :id, "--cpus", 2]
     end
